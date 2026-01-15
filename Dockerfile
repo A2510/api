@@ -15,8 +15,18 @@ RUN pip install -r requirements.txt
 # Set work directory
 WORKDIR /usr/src/app
 
+
+
 # Copy the rest of the project into the container
 COPY . .
+
+RUN python manage.py makemigrations --no-input
+RUN python manage.py migrate --no-input
+
+RUN python manage.py collectstatic --no-input --clear
+
+RUN echo "from authentication.models import CustomUser; CustomUser.objects.create_superuser('admin@gmail.com', '1234')" | python manage.py shell
+
 
 # Ensure entrypoint.sh is executable
 RUN ["chmod", "+x", "./entrypoint.sh"]
